@@ -24,7 +24,6 @@ module.exports = (grunt) ->
 
     clean: [
       'lib'
-      'dist'
     ]
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'

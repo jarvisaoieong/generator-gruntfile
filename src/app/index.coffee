@@ -6,15 +6,15 @@ exports = module.exports = class Generator extends yeoman.generators.Base
   constructor: (args, options, config) ->
     super
     @basename = path.basename options.env.cwd
-    # @on 'end', ->
-    #   @installDependencies skipInstall: options['skip-install']
+    @on 'end', ->
+      @installDependencies skipInstall: options['skip-install']
 
   askFor: ->
     done = @async()
     console.log @yeoman
     @prompt [
       name: 'name'
-      message: 'App name'
+      message: 'name'
       default: @basename
     ,
       name: 'description'
@@ -27,7 +27,7 @@ exports = module.exports = class Generator extends yeoman.generators.Base
     ,
       name: 'env'
       type: 'list'
-      message: 'Which environment'
+      message: 'Target for'
       choices: ['node', 'bower']
     ],
       (props) =>
@@ -39,6 +39,7 @@ exports = module.exports = class Generator extends yeoman.generators.Base
     @directory 'root', '.'
     @template "#{@env}/_package.json", 'package.json'
     @template "#{@env}/_Gruntfile.coffee", 'Gruntfile.coffee'
+    @template "#{@env}/_bower.json", 'bower.json' if @env is 'bower'
 
   writeSrcFile: ->
     @mkdir 'src'

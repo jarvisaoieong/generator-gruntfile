@@ -12,6 +12,11 @@ exports = module.exports = Generator = (function(_super) {
   function Generator(args, options, config) {
     Generator.__super__.constructor.apply(this, arguments);
     this.basename = path.basename(options.env.cwd);
+    this.on('end', function() {
+      return this.installDependencies({
+        skipInstall: options['skip-install']
+      });
+    });
   }
 
   Generator.prototype.askFor = function() {
@@ -22,7 +27,7 @@ exports = module.exports = Generator = (function(_super) {
     return this.prompt([
       {
         name: 'name',
-        message: 'App name',
+        message: 'name',
         "default": this.basename
       }, {
         name: 'description',
@@ -35,7 +40,7 @@ exports = module.exports = Generator = (function(_super) {
       }, {
         name: 'env',
         type: 'list',
-        message: 'Which environment',
+        message: 'Target for',
         choices: ['node', 'bower']
       }
     ], function(props) {
@@ -48,7 +53,10 @@ exports = module.exports = Generator = (function(_super) {
     this.template('_README.md', 'README.md');
     this.directory('root', '.');
     this.template("" + this.env + "/_package.json", 'package.json');
-    return this.template("" + this.env + "/_Gruntfile.coffee", 'Gruntfile.coffee');
+    this.template("" + this.env + "/_Gruntfile.coffee", 'Gruntfile.coffee');
+    if (this.env === 'bower') {
+      return this.template("" + this.env + "/_bower.json", 'bower.json');
+    }
   };
 
   Generator.prototype.writeSrcFile = function() {

@@ -1,0 +1,12 @@
+{
+  "name": "<%= name %>",
+  "version": "<%= version %>",
+  "main": "dist/<%= name %>.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
