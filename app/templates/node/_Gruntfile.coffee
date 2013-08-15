@@ -34,3 +34,7 @@ module.exports = (grunt) ->
     'clean'
     'coffee'
   ]
+
+  grunt.registerTask 'default', [
+    'watch'
+  ]

@@ -49,3 +49,7 @@ module.exports = (grunt) ->
     'concat'
     'uglify'
   ]
+
+  grunt.registerTask 'default', [
+    'watch'
+  ]

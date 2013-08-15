@@ -23,7 +23,7 @@ exports.prototype.askFor = function() {
   this.prompt([
     {
       name: 'name',
-      message: 'name',
+      message: 'Project name',
       "default": this.basename
     }, {
       name: 'description',
@@ -34,10 +34,51 @@ exports.prototype.askFor = function() {
       message: 'Version',
       "default": '0.0.0'
     }, {
+      name: 'author',
+      message: 'Author',
+      "default": this.user.git.username
+    }, {
+      name: 'email',
+      message: 'Email',
+      "default": this.user.git.email
+    }, {
       name: 'env',
       type: 'list',
       message: 'Target for',
       choices: ['node', 'bower']
+    }, {
+      name: 'usingGithub',
+      message: 'Using GitHub?',
+      type: 'confirm',
+      "default": true
+    }, {
+      name: 'githubUser',
+      message: 'GitHub user',
+      "default": function(answers) {
+        var githubUser = this.shell.exec('git config --get github.user', {silent: true}).output.trim();
+        return githubUser || answers.author;
+      }.bind(this),
+      when: function(answers) {
+        return answers.usingGithub;
+      }
+    }, {
+      name: 'githubRepo',
+      message: 'GitHub repo',
+      "default": function(answers) {
+        return answers.name;
+      }.bind(this),
+      when: function(answers) {
+        return answers.usingGithub;
+      }
+    }, {
+      name: 'licenses',
+      message: 'Licenses',
+      type: 'checkbox',
+      choices: [{name: 'MIT', checked: true}, 'Apache-2.0', 'MPL-2.0', 'GPL-2.0'],
+      "default": 'MIT',
+      when: function(answers) {
+        return answers.usingGithub;
+      }
     }
   ], function(props) {
     this._.extend(this, props);
@@ -46,16 +87,37 @@ exports.prototype.askFor = function() {
 };
 
 exports.prototype.copyRootFile = function() {
-  this.template('_README.md', 'README.md');
   this.directory('root', '.');
-  this.template("" + this.env + "/_package.json", 'package.json');
-  this.template("" + this.env + "/_Gruntfile.coffee", 'Gruntfile.coffee');
-  if (this.env === 'bower') {
-    this.template("" + this.env + "/_bower.json", 'bower.json');
-  }
+  this.copy('_README.md', 'README.md');
 };
 
-exports.prototype.writeSrcFile = function() {
-  this.mkdir('src');
-  this.write("src/" + this.name + ".coffee", '');
+exports.prototype.copyLicenses = function() {
+  if (!this.licenses || this._.isEmpty(this.licenses)) {
+    return;
+  };
+  this._.each(this.licenses, function(license) {
+    var licenseFile = 'LICENSE-' + license;
+    this.copy('licenses/' + licenseFile, licenseFile);
+  }.bind(this));
 };
+
+exports.prototype.copyNodeFiles = function() {
+  if (this.env !== 'node') {
+    return;
+  };
+  this.copy('node/_package.json', 'package.json');
+  this.copy('node/_Gruntfile.coffee', 'Gruntfile.coffee');
+}
+
+exports.prototype.copyBowerFiles = function() {
+  if (this.env !== 'bower') {
+    return;
+  };
+  this.copy('bower/_package.json', 'package.json');
+  this.copy('bower/_Gruntfile.coffee', 'Gruntfile.coffee');
+  this.copy('bower/_bower.json', 'bower.json');
+}
+
+exports.prototype.createSrcFile = function() {
+  this.write('src/' + this.name + '.coffee', '');
+}
