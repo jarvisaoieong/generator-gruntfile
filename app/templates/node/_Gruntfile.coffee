@@ -9,13 +9,8 @@ module.exports = (grunt) ->
       compile:
         options:
           bare: true
-        files: [
-          expand: true
-          cwd: 'src'
-          src: '*.coffee'
-          dest: 'lib'
-          ext: '.js'
-        ]
+        files:
+          'lib/<%= pkg.name %>.js': 'src/<%= pkg.name %>.coffee'
 
     watch:
       scripts:

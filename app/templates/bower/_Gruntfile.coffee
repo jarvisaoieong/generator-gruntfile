@@ -8,7 +8,7 @@ module.exports = (grunt) ->
     concat:
       dist:
         src: [
-          'lib/*.js'
+          'lib/<%= pkg.name %>.js'
         ]
         dest: 'dist/<%%= pkg.name %>.js'
 
@@ -19,13 +19,8 @@ module.exports = (grunt) ->
 
     coffee:
       compile:
-        files: [
-          expand: true
-          cwd: 'src'
-          src: '*.coffee'
-          dest: 'lib'
-          ext: '.js'
-        ]
+        files:
+          'lib/<%= pkg.name %>.js': 'src/<%= pkg.name %>.coffee'
 
     watch:
       scripts:
